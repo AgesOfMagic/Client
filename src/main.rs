@@ -26,7 +26,7 @@ const SIZE: (u32, u32) = (80, 80);
 const NAME: &str = "Roguelike";
 
 fn main() {
-    let mut argsv: Vec<String> = args().collect();
+    let argsv: Vec<String> = args().collect();
     let ip = if argsv.len() > 1 {
         argsv[1].clone()
     }else {
@@ -42,7 +42,6 @@ fn main() {
     let ts = TileSet::new("cp437_10x10.png", (10, 10), (0, 0));
 
     let mut closed = false;
-    let mut now = Instant::now();
 
     let mut name = [0; 128];
     let mut version = [0; 16];
@@ -90,7 +89,6 @@ fn main() {
         return buff;
     });
     while !closed {
-        now = Instant::now();
         root.clear();
         for game_datum in game_data.entity_vec.iter() {
             let r_x = (game_datum.1).0 - game_data.player_pos.0 + SIZE.0  as i32 / 2;
