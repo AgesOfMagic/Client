@@ -1,0 +1,14 @@
+[package]
+name = "rsrl"
+version = "0.1.0"
+authors = ["gguurr <gurkovacs@gmail.com>"]
+edition = "2018"
+build = "build.rs"
+
+[build-dependencies]
+cc = "1.0"
+
+[dependencies]
+glium = "0.23.0"
+image = "0.21.0"
+rand = "0.6.5"
