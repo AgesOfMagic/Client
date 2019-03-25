@@ -184,10 +184,12 @@ pub const ETXTBSY: u32 = 139;
 pub const EWOULDBLOCK: u32 = 140;
 pub const _NLSCMPERROR: u32 = 2147483647;
 pub const PACKET_SIZE: u32 = 512;
+pub const HEADER_SIZE: u32 = 128;
 pub const HAND_SHAKE_CLIENT_ID: u32 = 0;
 pub const MOVEMENT_PACKET_ID: u32 = 1;
 pub const HAND_SHAKE_SERVER_ID: u32 = 0;
-pub const UPDATE_POSTION_ID: u32 = 1;
+pub const UPDATE_POSITION_ID: u32 = 1;
+pub const UPDATE_FILE_HEADER_ID: u32 = 2;
 pub type va_list = *mut ::std::os::raw::c_char;
 extern "C" {
     pub fn __va_start(arg1: *mut *mut ::std::os::raw::c_char, ...);
@@ -3450,6 +3452,7 @@ pub const PacketTypes_HAND_SHAKE_CLIENT_TYPE: PacketTypes = 1;
 pub const PacketTypes_HAND_SHAKE_SERVER_TYPE: PacketTypes = 2;
 pub const PacketTypes_MOVEMENT_PACKET_TYPE: PacketTypes = 3;
 pub const PacketTypes_UPDATE_POSITION_TYPE: PacketTypes = 4;
+pub const PacketTypes_UPDATE_FILE_HEADER_TYPE: PacketTypes = 5;
 pub type PacketTypes = i32;
 pub const Status_UNRECOGNIZED: Status = 0;
 pub const Status_OK: Status = 1;
@@ -3555,13 +3558,13 @@ fn bindgen_test_layout_MovementPacket() {
 pub struct HandShakeServer {
     pub status: Status,
     pub serverVersion: [::std::os::raw::c_uchar; 16usize],
-    pub characterData: [::std::os::raw::c_uchar; 492usize],
+    pub serverName: [::std::os::raw::c_uchar; 128usize],
 }
 #[test]
 fn bindgen_test_layout_HandShakeServer() {
     assert_eq!(
         ::std::mem::size_of::<HandShakeServer>(),
-        512usize,
+        148usize,
         concat!("Size of: ", stringify!(HandShakeServer))
     );
     assert_eq!(
@@ -3590,22 +3593,22 @@ fn bindgen_test_layout_HandShakeServer() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<HandShakeServer>())).characterData as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<HandShakeServer>())).serverName as *const _ as usize },
         20usize,
         concat!(
             "Offset of field: ",
             stringify!(HandShakeServer),
             "::",
-            stringify!(characterData)
+            stringify!(serverName)
         )
     );
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct UpdatePosition {
-    pub x: ::std::os::raw::c_int,
-    pub y: ::std::os::raw::c_int,
-    pub id: ::std::os::raw::c_uint,
+    pub x: ::std::os::raw::c_long,
+    pub y: ::std::os::raw::c_long,
+    pub id: ::std::os::raw::c_ulong,
 }
 #[test]
 fn bindgen_test_layout_UpdatePosition() {
@@ -3650,6 +3653,48 @@ fn bindgen_test_layout_UpdatePosition() {
         )
     );
 }
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct UpdateFileHeader {
+    pub length: ::std::os::raw::c_ulong,
+    pub name: [::std::os::raw::c_uchar; 72usize],
+}
+#[test]
+fn bindgen_test_layout_UpdateFileHeader() {
+    assert_eq!(
+        ::std::mem::size_of::<UpdateFileHeader>(),
+        76usize,
+        concat!("Size of: ", stringify!(UpdateFileHeader))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<UpdateFileHeader>(),
+        4usize,
+        concat!("Alignment of ", stringify!(UpdateFileHeader))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<UpdateFileHeader>())).length as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(UpdateFileHeader),
+            "::",
+            stringify!(length)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<UpdateFileHeader>())).name as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(UpdateFileHeader),
+            "::",
+            stringify!(name)
+        )
+    );
+}
+extern "C" {
+    pub fn calculateBigPacket(length: ::std::os::raw::c_ulonglong) -> ::std::os::raw::c_ushort;
+}
 extern "C" {
     pub fn cutStr(
         str: *mut ::std::os::raw::c_uchar,
@@ -3680,6 +3725,14 @@ extern "C" {
 }
 extern "C" {
     pub fn bufferToMovement(buff: *mut ::std::os::raw::c_uchar) -> MovementPacket;
+}
+extern "C" {
+    pub fn updateFileHeaderToBuffer(
+        updateFileHeader: UpdateFileHeader,
+    ) -> *mut ::std::os::raw::c_uchar;
+}
+extern "C" {
+    pub fn bufferToupdateFileHeader(buff: *mut ::std::os::raw::c_uchar) -> UpdateFileHeader;
 }
 extern "C" {
     pub fn updatePositionToBuffer(updatePosition: UpdatePosition) -> *mut ::std::os::raw::c_uchar;

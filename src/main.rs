@@ -18,6 +18,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread::sleep;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
 
 use std::env::args;
 
@@ -39,8 +41,6 @@ fn main() {
     };
     let mut game_data = game::Game{entity_vec: HashMap::new(), player_pos:(0,0)};
 
-    let ts = TileSet::new("cp437_10x10.png", (10, 10), (0, 0));
-
     let mut closed = false;
 
     let mut name = [0; 128];
@@ -53,6 +53,7 @@ fn main() {
     let mut socket = TcpStream::connect(addres).unwrap();
     let mut read_socket = socket.try_clone().unwrap();
     let mut is_ok = false;
+    let mut server_name = String::new();
     while !is_ok {
 
         sleep(Duration::from_millis(1500));
@@ -73,9 +74,24 @@ fn main() {
             if hs_server.status == protocol::protocol::Status_OK{
                 is_ok = true;
             }
+            server_name = String::from(String::from_utf8_lossy(&hs_server.serverName));
+            std::fs::create_dir(format!("{}({})",server_name, ip)).unwrap();
+        }
+    }
+    let mut len: u32 = 1;
+    let mut buff_v = vec![];
+    socket.read_to_end(&mut buff_v).unwrap();
+    unsafe{
+        let buff = buff_v.as_mut_slice();
+        while len > 0 || protocol::protocol::identify(buff[0], 1) != protocol::protocol::PacketTypes_UPDATE_FILE_HEADER_TYPE{
+            let packet = protocol::protocol::bufferToupdateFileHeader(&mut buff[0]);
+            len = packet.length;
+            let mut file = File::create(format!("{}({})\\{}",server_name, ip, String::from(String::from_utf8_lossy(&packet.name)))).unwrap();
+            file.write_all(&buff[protocol::protocol::HEADER_SIZE as usize..]).unwrap();
         }
     }
 
+    let ts = TileSet::new("tileset.png", (10, 10), (0, 0));
     let mut read_thread;
     let mut root = Root::new(ts, SIZE, NAME);
     let is_there_data = AtomicBool::new(false);
