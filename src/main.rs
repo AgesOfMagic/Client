@@ -91,7 +91,7 @@ fn main() {
         }
     }
 
-    let ts = TileSet::new("tileset.png", (10, 10), (0, 0));
+    let ts = TileSet::new(format!("{}({})\\tileset.png",server_name, ip), (10, 10), (0, 0));
     let mut read_thread;
     let mut root = Root::new(ts, SIZE, NAME);
     let is_there_data = AtomicBool::new(false);
