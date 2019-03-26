@@ -126,7 +126,7 @@ impl Root {
     // 41,42,43,44,
     // 51,52,53,54
 
-    pub fn resize(&mut self, size: (u32, u32)) {
+    pub fn rescale(&mut self, size: (u32, u32)) {
         self.size = size;
     }
 

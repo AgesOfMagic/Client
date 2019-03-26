@@ -3732,7 +3732,7 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_uchar;
 }
 extern "C" {
-    pub fn bufferToupdateFileHeader(buff: *mut ::std::os::raw::c_uchar) -> UpdateFileHeader;
+    pub fn bufferToUpdateFileHeader(buff: *mut ::std::os::raw::c_uchar) -> UpdateFileHeader;
 }
 extern "C" {
     pub fn updatePositionToBuffer(updatePosition: UpdatePosition) -> *mut ::std::os::raw::c_uchar;
